@@ -1,16 +1,17 @@
 const gameBoard = (function(doc){
     let board=[];
     const mainDiv = doc.querySelector(".mainDiv");
+    const reselect = doc.createElement('button');
+    const rematch = doc.createElement('button');
 
     const populator = function(doc){
         if(!!doc){
             for(let x = 0;x<9;x++){
                 board[x]= doc.createElement("div");
                 board[x].classList.add("boardPiece");
+                board[x].classList.add("invisibleText");
                 board[x].setAttribute("data-played", "false");
-                //test
                 board[x].innerText = x;
-                //test
                 mainDiv.append(board[x]);
             }
         }
@@ -18,13 +19,24 @@ const gameBoard = (function(doc){
             alert("Error! no document found!");
         }
     }
-
+    const resetBoard = function(){
+        mainDiv.classList.remove("preGame");
+        mainGameLogic.initCPULogic();
+    }
+    const gameStart = function(){
+        mainDiv.classList.remove("preGame");
+        mainGameLogic.initCPULogic();
+    }
+    const gameEnd = function(){
+        //mainDiv.classList.add("preGame");
+        mainDiv.append(rematch, reselect);
+    }
+    rematch.addEventListener('click', () =>{resetBoard()});
     populator(doc);
+    gameEnd();
 
-    return{board};
-
+    return{board, gameStart, gameEnd,};
 })(document);
-
 
 const playerFactory = (playerName) =>{
     const _playerName = playerName;
@@ -56,15 +68,26 @@ const mainGameLogic = (function(board) {
     let _players = [];
     let playCount = 2;
     const _board = board;
+    const playCountAlert = function(val){
+        playCount+= val;
+        cpuLogic(getActivePlayer());
+    }
 
     const setPlayers = function(newPlayer){
-        if(!_players[0]){_players[0]=newPlayer; newPlayer.setSign("X");}
-        else{_players[1] = newPlayer; newPlayer.setSign("O");}
+        if(!_players[0]){
+            _players[0]=newPlayer; 
+            newPlayer.setSign("X");
+            }
+        else{
+            _players[1] = newPlayer; 
+            newPlayer.setSign("O"); 
+            gameBoard.gameStart();}
     }
     const playMove = function(boardPiece, activePlayer){
         let validMove = false;
         if(boardPiece.dataset.played == 'false'){
             boardPiece.innerText = activePlayer.getSign();
+            boardPiece.classList.remove("invisibleText");
             boardPiece.dataset.played = 'true';
             validMove = true;
         }
@@ -75,7 +98,8 @@ const mainGameLogic = (function(board) {
         (playCount %2 == 0) ? activePlayer = _players[0] : activePlayer = _players[1];
         return activePlayer;
     }
-    const playLogic = function(){
+    //returns whether game ends or not
+    const gameOver = function(){
         let gameEnd = false;
         if(_board[0].innerText == _board[1].innerText && _board[0].innerText == _board[2].innerText){
             getActivePlayer().hasWon();
@@ -109,29 +133,69 @@ const mainGameLogic = (function(board) {
             getActivePlayer().hasWon();
             gameEnd = true;
         }
-        else if(playCount == 8){
+        else if(playCount == 10){
             gameEnd = true;
         }
         return gameEnd;
     }
+
     const reset = function(){
-        //build up reset logic here.
-        alert("Game Over!");
+        _board.forEach((boardPiece, index) =>{boardPiece.dataset.played = 'false'; boardPiece.classList.add("invisibleText"); boardPiece.innerText = index;})
+        playCount = 2;
+        scoreFields.set("field1", _players[0].getWins());
+        scoreFields.set("field2", _players[1].getWins());
+        gameBoard.gameEnd();
+        
     }
 
+    const initCPULogic = function(){
+        cpuLogic(getActivePlayer());
+    }
     for (let x = 0; x < _board.length; x++){
         _board[x].addEventListener('click', function(){
-            if(playMove(_board[x],getActivePlayer())){
-                if(playLogic()){
-                    reset();
-                }
-                playCount++;
-                }
+                playerMakeMove(board[x],getActivePlayer());
             })
     }
 
-    return{setPlayers}
+    //returns whether move was successful or not
+    const playerMakeMove = function(boardPiece, player){
+        if(playMove(boardPiece,player)){
+            if(gameOver()){
+                reset();
+                return true;
+            }
+            playCountAlert(1);
+            return true;
+        }return false;       
+    }
+
+    const cpuLogic = function(cpuPlayer){
+        if(cpuPlayer.getName() == "CPU"){
+            while(!playerMakeMove(_board[getRandomMove()], cpuPlayer));
+        }
+    }
+
+    const getRandomMove = function(){
+        return Math.floor(Math.random()*9);
+    }
+    
+    return{setPlayers, initCPULogic}
 })(gameBoard.board);
 
+
+const scoreFields = (function(){
+    const field1 = document.querySelector(".Score1");
+    const field2 = document.querySelector(".Score2");
+    const fields = {field1, field2};
+
+    const set = function(name, val){
+        fields[name].innerText = val; 
+    }
+    return{set};
+})()
+
+
 const buttons = document.querySelectorAll(".player");
-buttons.forEach(button => button.addEventListener("click", function(){playerFactory(button.innerText).newPlayer()}));
+buttons.forEach(button => button.addEventListener("click", function(){
+        playerFactory(button.innerText).newPlayer();
+        button.classList.add("preGame");}));

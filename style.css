@@ -3,9 +3,13 @@ body{
 }
 
 .boardPiece{
-    border-style: solid;
     border-spacing: 1px;
     background:whitesmoke;
+    text-align: center;
+    font-size: 30px;
+    display: table;
+    line-height: 132px;
+
 }
 .mainDiv{
     margin-left: auto;
@@ -17,6 +21,23 @@ body{
     grid-template-rows: auto;
     height: 400px;
     width: 400px;
-    background: green;
-
+}
+.invisibleText{
+    color: whitesmoke;
+}
+.preGame{
+    visibility: hidden;
+}
+.buttons{
+    position: absolute;
+    top: 70%;
+    left: 50%;
+    margin-left: -50px;
+    margin-top: -50px;
+    text-align: center;
+}
+.player{
+    height:100px;
+    width:100px;
+    border-radius: 25%;
 }
