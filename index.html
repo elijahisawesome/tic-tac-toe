@@ -4,20 +4,31 @@
         <title>Tic-Tac-Toe!</title>
         <link rel="stylesheet" href="style.css">
     </head>
-
     <body>
+        <div class="Score1 scores">
+            <p>Player 1</p>
+            <p id="Score1">0</p>
+        </div>
+        <div class="Score2 scores">
+            <p>Player 2</p>
+            <p id="Score2">0</p>
+        </div>
         <div class="mainDiv">
 
         </div>
+        <div class = "endGameControls"></div>
         <div class="buttons">
-            <button class="player">player1</button>
-            <button class="player">CPU</button>
-            <button class="player">player2</button>
-            <button class="player">CPU</button>
+            <div id="p1Buttons">Choose Player 1
+                <button class="player">player1</button>
+                <button class="player">CPU</button>
+            </div>
+            <div id="p2Buttons">Choose Player 2
+                <button class="player">player2</button>
+                <button class="player">CPU</button>
+            </div>
+            <button class = "Start">Start!</button>
         </div>
-        <div class="Score1 scores"></div>
-        <div class="Score2 scores"></div>
-        
+            
         <script src="script.js"></script>
 
     </body>

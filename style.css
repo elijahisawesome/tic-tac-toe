@@ -28,16 +28,50 @@ body{
 .preGame{
     visibility: hidden;
 }
-.buttons{
-    position: absolute;
-    top: 70%;
-    left: 50%;
-    margin-left: -50px;
-    margin-top: -50px;
-    text-align: center;
-}
 .player{
     height:100px;
     width:100px;
     border-radius: 25%;
+}
+.endGameControls{
+    margin-left:auto;
+    margin-right: auto;
+    margin-top: 10px;
+    height: 100px;
+    width: 300px;
+    border-radius: 20%;
+    text-align: center;
+}
+.controlButton{
+    height:20px;
+    width: 100px;
+    text-align: center;
+}
+.scores{
+    background: whitesmoke;
+    border-style: solid;
+    border-width: 1px;
+    border-radius: 15%;
+    box-shadow: 3px 3px 4px;
+    text-align: center;
+}
+.Score2{
+    float: right;
+}
+.Score1{
+    float:left;
+}
+#p1buttons{
+    float:left;
+    width: 200px;
+    background: whitesmoke;
+}
+#p2buttons{
+    float:right;
+    width: 200px;
+    background: whitesmoke;
+}
+.buttons{
+    text-align:center;
+    width: auto;
 }

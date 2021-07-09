@@ -3,9 +3,14 @@ const gameBoard = (function(doc){
     const mainDiv = doc.querySelector(".mainDiv");
     const reselect = doc.createElement('button');
     const rematch = doc.createElement('button');
+    const endGameControls = doc.querySelector(".endGameControls");
 
     const populator = function(doc){
         if(!!doc){
+            reselect.classList.add("controlButton");
+            reselect.innerText = "reselect";
+            rematch.classList.add("controlButton");
+            rematch.innerText = "rematch";
             for(let x = 0;x<9;x++){
                 board[x]= doc.createElement("div");
                 board[x].classList.add("boardPiece");
@@ -21,17 +26,23 @@ const gameBoard = (function(doc){
     }
     const resetBoard = function(){
         mainDiv.classList.remove("preGame");
+        endGameControls.classList.remove("preGame");
         mainGameLogic.initCPULogic();
     }
     const gameStart = function(){
         mainDiv.classList.remove("preGame");
+        endGameControls.classList.remove("preGame");
         mainGameLogic.initCPULogic();
     }
     const gameEnd = function(){
-        //mainDiv.classList.add("preGame");
-        mainDiv.append(rematch, reselect);
+        mainDiv.classList.add("preGame");
+        endGameControls.append(rematch, reselect);
+        endGameControls.classList.add("preGame");
     }
-    rematch.addEventListener('click', () =>{resetBoard()});
+
+    
+    rematch.addEventListener('click', () =>{resetBoard();console.log("hey");});
+    reselect.addEventListener('click', () => {playerSelectionButtonsManager.reset(); mainGameLogic.wipe() })
     populator(doc);
     gameEnd();
 
@@ -144,7 +155,8 @@ const mainGameLogic = (function(board) {
         playCount = 2;
         scoreFields.set("field1", _players[0].getWins());
         scoreFields.set("field2", _players[1].getWins());
-        gameBoard.gameEnd();
+        //gameBoard.gameEnd();
+        initCPULogic();
         
     }
 
@@ -178,14 +190,23 @@ const mainGameLogic = (function(board) {
     const getRandomMove = function(){
         return Math.floor(Math.random()*9);
     }
+
+    const wipe = function(){
+        _board.forEach((boardPiece, index) =>{boardPiece.dataset.played = 'false'; boardPiece.classList.add("invisibleText"); boardPiece.innerText = index;})
+        playCount = 2;
+        scoreFields.set("field1", 0);
+        scoreFields.set("field2", 0);
+        _players = [];
+        gameBoard.gameEnd();
+    }
     
-    return{setPlayers, initCPULogic}
+    return{setPlayers, initCPULogic, wipe}
 })(gameBoard.board);
 
 
 const scoreFields = (function(){
-    const field1 = document.querySelector(".Score1");
-    const field2 = document.querySelector(".Score2");
+    const field1 = document.getElementById("Score1");
+    const field2 = document.getElementById("Score2");
     const fields = {field1, field2};
 
     const set = function(name, val){
@@ -194,8 +215,42 @@ const scoreFields = (function(){
     return{set};
 })()
 
+const playerSelectionButtonsManager = (function(){
+    const buttons = document.querySelectorAll(".player");
+    const start = document.querySelector(".start");
+    let playerSelection = [];
+    let playersReady = 0;
+    buttons.forEach(button => button.addEventListener("click", function(e)
+    {
+        selectionMade(e);
+    }
+        ));
+    start.addEventListener('click', function(e){startGame()})
 
-const buttons = document.querySelectorAll(".player");
-buttons.forEach(button => button.addEventListener("click", function(){
-        playerFactory(button.innerText).newPlayer();
-        button.classList.add("preGame");}));
+    const selectionMade = function(e){
+        playerSelection[playersReady] = e.target.innerText;
+        playersReady++;
+        e.target.parentNode.classList.add("preGame");
+    }
+
+    const startGame = function(){
+        if(playersReady !== 2){
+            console.log("you fucked up");
+            return;
+        }
+        start.classList.add("preGame");
+
+        playerSelection.forEach(player => {
+            console.log(player);
+            playerFactory(player).newPlayer();
+        })
+    }
+
+    const reset = function(){
+        playersReady = 0;
+        buttons.forEach(button => {button.parentNode.classList.remove("preGame");})
+        start.classList.remove("preGame");
+    }
+    return {reset};
+})()
+
